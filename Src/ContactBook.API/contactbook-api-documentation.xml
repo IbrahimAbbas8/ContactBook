@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ContactBook.API</name>
+    </assembly>
+    <members>
+        <member name="M:ContactBook.API.Controllers.AccountController.Login(ContactBook.Core.Dtos.LoginDto)">
+            <summary>
+            Login using your email and password
+            </summary>
+            <param name="dto">Email and password</param>
+            <returns>FullName and email and token</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.AccountController.Register(ContactBook.Core.Dtos.RegisterDto)">
+            <summary>
+            Create an account and profile
+            </summary>
+            <param name="dto">Account and profile information</param>
+            <returns>FullName and email and token</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.AccountController.GetCurrentUser">
+            <summary>
+            To return the current user
+            </summary>
+            <returns>FullName and email and token</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.AccountController.CheckEmailExist(System.String)">
+            <summary>
+            To check if the user exists via email
+            </summary>
+            <param name="email"></param>
+            <returns>True or false</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.AccountController.GetUserAddress">
+            <summary>
+            Returns the current user profile
+            </summary>
+            <returns>Profile</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.AccountController.UpdateUserProfile(ContactBook.Core.Dtos.ProfileDto)">
+            <summary>
+            Update current profile information
+            </summary>
+            <param name="dto">Profile information</param>
+            <returns>Profile</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.AccountController.ForgotPassword(ContactBook.Core.Entities.ForgotPassword)">
+            <summary>
+            Verify if the email exists
+            </summary>
+            <param name="forgot">email</param>
+            <returns>Email and true or false</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.AccountController.ResetPassword(ContactBook.Core.Entities.ResetPassword)">
+            <summary>
+            Reset password
+            </summary>
+            <param name="reset">Data needed to reset the password</param>
+            <returns>Returns the result</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.ActivityController.Get(ContactBook.Core.Sharing.ActivityParams)">
+            <summary>
+            Get a list of available activities
+            </summary>
+            <param name="Params">An object containing data for pagination</param>
+            <returns>List of activities</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.ContactController.Get(ContactBook.Core.Sharing.Params)">
+            <summary>
+            Get a list of available Contacts
+            </summary>
+            <param name="Params">An object containing data for searching and pagination</param>
+            <returns>List of Contacts</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.ContactController.GetById(System.Int32)">
+            <summary>
+            Get a specific contact by id
+            </summary>
+            <param name="id">ID of the requested contact</param>
+            <returns>contact</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.ContactController.Post(ContactBook.Core.Dtos.CreateContactDto)">
+            <summary>
+            Add a contact
+            </summary>
+            <param name="contactDto">The contact data transfer object containing the details of the contact to be added</param>
+            <returns>True Or False</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.ContactController.Put(System.Int32,ContactBook.Core.Dtos.UpdateContactDto)">
+            <summary>
+            Update a contact
+            </summary>
+            <param name="id">The key of the contact to be modified</param>
+            <param name="contactDto">An object containing data for searching and pagination</param>
+            <returns>True Or False</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.ContactController.Delete(System.Int32)">
+            <summary>
+            Delete a conteact by id
+            </summary>
+            <param name="id">The key of the contact to be Deleted</param>
+            <returns>True Or False</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.ContactController.ExportToPDF(ContactBook.Core.Sharing.Params)">
+            <summary>
+            Export data to pdf
+            </summary>
+            <param name="Params">An object containing data for searching and pagination</param>
+            <returns>File</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.EmailController.SendEmail(ContactBook.Core.Sharing.EmailRequest)">
+            <summary>
+            Send a text message to an email
+            </summary>
+            <param name="emailRequest">Data necessary for the transmission process</param>
+            <returns></returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.EmailController.SendEmailPDF(ContactBook.Core.Sharing.EmailRequestPDF,ContactBook.Core.Sharing.Params)">
+            <summary>
+            Send a PDF file to an email
+            </summary>
+            <param name="emailRequest">The email sent to him</param>
+            <param name="Params">An object containing data for searching and pagination</param>
+            <returns></returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.EmailController.ExportToPDF(ContactBook.Core.Sharing.Params)">
+            <summary>
+            Generate the file to send by email
+            </summary>
+            <param name="Params">An object containing data for searching and pagination</param>
+            <returns>Array byte</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.InviteUserController.Get(ContactBook.Core.Sharing.Params)">
+            <summary>
+            Get a list of available InviteUsers
+            </summary>
+            <param name="Params">An object containing data for searching and pagination</param>
+            <returns>List of InviteUsers</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.InviteUserController.GetById(System.Int32)">
+            <summary>
+            Get a specific inviteUser by id
+            </summary>
+            <param name="id">ID of the requested inviteUser</param>
+            <returns>inviteUser</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.InviteUserController.Post(ContactBook.Core.Dtos.CreateInviteUserDto)">
+            <summary>
+            Add a inviteUser
+            </summary>
+            <param name="inviteUserDto">The inviteUser data transfer object containing the details of the contact to be added</param>
+            <returns>True Or False</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.InviteUserController.Put(System.Int32,ContactBook.Core.Dtos.UpdateInviteUserDto)">
+            <summary>
+            Update a inviteUser
+            </summary>
+            <param name="id">The key of the inviteUser to be modified</param>
+            <param name="inviteUserDto">An object containing data for searching and pagination</param>
+            <returns>True Or False</returns>
+        </member>
+        <member name="M:ContactBook.API.Controllers.InviteUserController.Delete(System.Int32)">
+            <summary>
+            Delete a inviteUser by id
+            </summary>
+            <param name="id">The key of the inviteUser to be Deleted</param>
+            <returns>True Or False</returns>
+        </member>
+    </members>
+</doc>
