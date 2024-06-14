@@ -166,5 +166,35 @@
             <param name="id">The key of the inviteUser to be Deleted</param>
             <returns>True Or False</returns>
         </member>
+        <member name="M:ContactBook.API.Extensions.UserManagerExtensions.FindUserByClaimPrincipalWithProfile(Microsoft.AspNetCore.Identity.UserManager{ContactBook.Core.Entities.AppUser},System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            An extension to access the current profile
+            </summary>
+            <param name="userManager"></param>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ContactBook.API.Extensions.UserManagerExtensions.FindEmailByClaimPrincipal(Microsoft.AspNetCore.Identity.UserManager{ContactBook.Core.Entities.AppUser},System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            An extension to access the current user
+            </summary>
+            <param name="userManager"></param>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ContactBook.API.Extensions.UserManagerExtensions.FindUserId(Microsoft.AspNetCore.Identity.UserManager{ContactBook.Core.Entities.AppUser},System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            An extension to access the current userId
+            </summary>
+            <param name="userManager"></param>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ContactBook.API.Helper.ContactUrlResolver.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            To return the URL correctly for operation
+            </summary>
+            <param name="configuration"></param>
+        </member>
     </members>
 </doc>

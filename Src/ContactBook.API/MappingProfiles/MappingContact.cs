@@ -11,8 +11,9 @@ namespace ContactBook.API.MappingProfiles
     {
         public MappingContact()
         {
+
             CreateMap<Contact, ContactDto>()
-                .ForMember(x => x.AccountName, c => c.MapFrom(cd => $"{cd.AppUser.FirstName} {cd.AppUser.LastName}"))
+              //  .ForMember(x => x.AccountName, c => c.MapFrom(cd => $"{cd.FirstName} {cd.AppUser.LastName}"))
                 .ForMember(pd => pd.ContactPicture, p => p.MapFrom<ContactUrlResolver>())
                 .ReverseMap();
             CreateMap<Contact, CreateContactDto>().ReverseMap();

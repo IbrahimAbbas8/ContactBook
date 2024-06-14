@@ -11,6 +11,7 @@ namespace ContactBook.Core.Interfaces
 {
     public interface IInviteUserRepository : IGenericRepository<InviteUser>
     {
-        Task<IList<InviteUserDto>> GetAllAsync(Params Params, string AccountId);
+        Task<IList<InviteUserDto>> GetAllAsync(Params Params, int ProfileId);
+        Task<bool> AddAsyncInvite(InviteUser invite);
     }
 }

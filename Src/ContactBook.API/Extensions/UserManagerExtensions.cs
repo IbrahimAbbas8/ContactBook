@@ -17,7 +17,7 @@ namespace ContactBook.API.Extensions
             userManager, ClaimsPrincipal user)
         {
             var email = user?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
-            return await userManager.Users.Include(x => x.Profile).SingleOrDefaultAsync(x => x.Email == email);
+            return await userManager.Users.Include(x => x.Profile).AsNoTracking().SingleOrDefaultAsync(x => x.Email == email);
         }
 
         /// <summary>
@@ -45,6 +45,13 @@ namespace ContactBook.API.Extensions
             var email = user?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
             var User = userManager.Users.SingleOrDefaultAsync(x => x.Email == email)?.Result;
             return User;
+        }
+
+        public static async Task<AppUser> FindUserByClaimPrincipalWithProfileWithInvitUrer(this UserManager<AppUser>
+            userManager, ClaimsPrincipal user)
+        {
+            var email = user?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
+            return await userManager.Users.Include(x => x.Profile).ThenInclude(iu => iu.inviteUsers).SingleOrDefaultAsync(x => x.Email == email);
         }
     }
 }

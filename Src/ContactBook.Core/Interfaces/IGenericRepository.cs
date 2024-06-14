@@ -20,5 +20,6 @@ namespace ContactBook.Core.Interfaces
         Task UpdateAsync(int id, T Entity);
         Task DeleteAsync(int id);
         Task<int> CountAsync();
+        Task SaveChanges();
     }
 }

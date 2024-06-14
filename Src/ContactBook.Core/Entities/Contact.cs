@@ -20,7 +20,7 @@ namespace ContactBook.Core.Entities
         public bool IsActive {  get; set; } = true;
         public string Address { get; set; }
         public string Address2 { get; set; }
-        public string AppUserId { get; set; }
-        public virtual AppUser? AppUser { get; set; }
+        public int ProfileId { get; set; }
+        public virtual Profile? Profile { get; set; }
     }
 }

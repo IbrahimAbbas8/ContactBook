@@ -45,8 +45,8 @@ namespace ContactBook.API.Controllers
         [HttpGet("get-all-contact")]
         public async Task<ActionResult> Get([FromQuery] Params Params)
         {
-            var AccountId = _userManager.FindUserId(HttpContext.User);
-            var contact = await _repository.GetAllAsync(Params, AccountId.Id);
+            var AccountId = _userManager.FindUserByClaimPrincipalWithProfile(HttpContext.User).Result;
+            var contact = await _repository.GetAllAsync(Params, AccountId.Profile.Id);
             if (contact is not null)
             {
                 return Ok(new Pagination<ContactDto>(Params.PageNumber, Params.PageSize, contact));
@@ -62,7 +62,8 @@ namespace ContactBook.API.Controllers
         [HttpGet("get-contact-by-id/{id}")]
         public async Task<ActionResult> GetById(int id)
         {
-            var contact = await _repository.GetByIdAsync(id, p => p.AppUser);
+            var AccountId = _userManager.FindUserId(HttpContext.User);
+            var contact = await _repository.GetByIdAsync(id, p => p.Profile);
             if (contact is not null)
             {
                 var res = mapper.Map<ContactDto>(contact);
@@ -70,7 +71,7 @@ namespace ContactBook.API.Controllers
                 { 
                     Contact = $"{contact.FirstName} {contact.LastName}", 
                     Action = "Access",
-                    User = $"{contact.AppUser.FirstName} {contact.AppUser.LastName}" 
+                    User = $"{AccountId.FirstName} {AccountId.LastName}" 
                 });
                 return Ok(res);
             }
@@ -92,8 +93,8 @@ namespace ContactBook.API.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var AccountId = _userManager.FindUserId(HttpContext.User);
-                    var res = await _repository.AddAsync(contactDto, AccountId.Id);
+                    var AccountId = _userManager.FindUserByClaimPrincipalWithProfile(HttpContext.User).Result;
+                    var res = await _repository.AddAsync(contactDto, AccountId.Profile.Id);
                     await activityRepository.AddAsync(new Activity
                     {
                         Contact = $"{contactDto.FirstName} {contactDto.LastName}",
@@ -191,8 +192,8 @@ namespace ContactBook.API.Controllers
         [HttpGet("export-to-pdf")]
         public async Task<IActionResult> ExportToPDF([FromQuery] Params Params)
         {
-            var AccountId = _userManager.FindUserId(HttpContext.User);
-            var contacts = await _repository.GetAllAsync(Params, AccountId.Id);
+            var AccountId = _userManager.FindUserByClaimPrincipalWithProfile(HttpContext.User).Result;
+            var contacts = await _repository.GetAllAsync(Params, AccountId.Profile.Id);
             var pdfBytes = pdfService.CreatePdf(contacts);
             return File(pdfBytes, "application/pdf", "contacts.pdf");
         }

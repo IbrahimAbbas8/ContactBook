@@ -1,6 +1,7 @@
 ﻿using ContactBook.Core.Entities;
 using ContactBook.Core.Helper;
 using ContactBook.Core.Interfaces;
+using ContactBook.Core.Sharing;
 using ContactBook.Infrastructure.Data;
 using ContactBook.Infrastructure.Data.Config;
 using ContactBook.Infrastructure.Repository;
@@ -30,11 +31,14 @@ namespace ContactBook.Infrastructure
             services.AddScoped<IPdfService, PdfService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IActivityRepository, ActivityRepository>();
+            services.AddScoped<IProfileRepository, ProfileRepository>();
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.AddDbContext<ContactBookDbContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("DefulteConnection"));
             });
+
+            services.AddHostedService<StatusUserUpdateService>();
 
             services.AddIdentity<AppUser, IdentityRole>()
                 .AddEntityFrameworkStores<ContactBookDbContext>()
@@ -56,6 +60,10 @@ namespace ContactBook.Infrastructure
                             ValidateAudience = false,
                         };
                     });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAdminOrUserRole", policy => policy.RequireRole(UserRoles.Admin, UserRoles.User));
+            });
 
             return services;
         }
@@ -65,7 +73,8 @@ namespace ContactBook.Infrastructure
             using (var scope = app.ApplicationServices.CreateScope())
             {
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
-                await SeedingData.SeedUserAsync(userManager);
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                await SeedingData.SeedUserAsync(userManager, roleManager);
             }
         }
     }

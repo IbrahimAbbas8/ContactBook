@@ -20,6 +20,6 @@ namespace ContactBook.Core.Dtos
         public bool IsActive { get; set; }
         public string Address { get; set; }
         public string Address2 { get; set; }
-        public string AccountName { get; set;}
+     //   public string AccountName { get; set;}
     }
 }

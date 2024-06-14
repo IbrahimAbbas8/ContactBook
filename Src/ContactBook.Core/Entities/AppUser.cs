@@ -11,8 +11,9 @@ namespace ContactBook.Core.Entities
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public virtual List<Contact> Contacts { get; set; } = new List<Contact>();
-        public virtual List<InviteUser> inviteUsers { get; set; } = new List<InviteUser>();
+        public bool IsInvite { get; set; } = false;
+        public int ProfileId { get; set; }
         public virtual Profile Profile { get; set; }
+        
     }
 }

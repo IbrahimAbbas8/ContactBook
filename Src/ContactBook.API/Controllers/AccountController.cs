@@ -2,7 +2,9 @@
 using ContactBook.API.Extensions;
 using ContactBook.Core.Dtos;
 using ContactBook.Core.Entities;
+using ContactBook.Core.Enum;
 using ContactBook.Core.Interfaces;
+using ContactBook.Core.Sharing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -22,13 +24,20 @@ namespace ContactBook.API.Controllers
         private readonly SignInManager<AppUser> signInManager;
         private readonly ITokenServices tokenServices;
         private readonly IMapper mapper;
+        private readonly IProfileRepository profileRepository;
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenServices tokenServices, IMapper mapper)
+        public AccountController(
+            UserManager<AppUser> userManager, 
+            SignInManager<AppUser> signInManager, 
+            ITokenServices tokenServices, 
+            IMapper mapper,
+            IProfileRepository profileRepository)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.tokenServices = tokenServices;
             this.mapper = mapper;
+            this.profileRepository = profileRepository;
         }
 
 
@@ -57,7 +66,8 @@ namespace ContactBook.API.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
-                Token = tokenServices.CreateToken(user),
+                IsInvite = user.IsInvite,
+                Token = tokenServices.CreateToken(user).Result,
             });
         }
 
@@ -93,12 +103,18 @@ namespace ContactBook.API.Controllers
             {
                 BadRequest();
             }
+            var rol = await userManager.AddToRoleAsync(user, UserRoles.Admin);
+            if (rol.Succeeded is false)
+            {
+                BadRequest();
+            }
+
             return Ok(new UserDto
             {
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
                 Email = dto.Email,
-                Token = tokenServices.CreateToken(user),
+                Token = tokenServices.CreateToken(user).Result,
             });
         }
 
@@ -118,7 +134,7 @@ namespace ContactBook.API.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user?.Email,
-                Token = tokenServices.CreateToken(user)
+                Token = tokenServices.CreateToken(user).Result
             });
         }
 
@@ -159,11 +175,20 @@ namespace ContactBook.API.Controllers
         [HttpPut("update-user-profile")]
         public async Task<IActionResult> UpdateUserProfile(ProfileDto dto)
         {
-            var user = await userManager.FindUserByClaimPrincipalWithProfile(HttpContext.User);
-            user.Profile = mapper.Map<Profile>(dto);
-            var res = await userManager.UpdateAsync(user);
-            if (res.Succeeded) return Ok(mapper.Map<ProfileDto>(user.Profile));
-            return BadRequest();
+            try
+            {
+                var user = await userManager.FindUserByClaimPrincipalWithProfile(HttpContext.User);
+                var profile = mapper.Map<Profile>(dto);
+                profile.Id = user.ProfileId;
+                await profileRepository.UpdateAsync(user.ProfileId, profile);
+                return Ok(mapper.Map<ProfileDto>(profile));
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex);
+            }
+            
         }
 
 
@@ -172,7 +197,7 @@ namespace ContactBook.API.Controllers
         /// </summary>
         /// <param name="forgot">email</param>
         /// <returns>Email and true or false</returns>
-        [HttpPost("ForgotPassword")]
+        [HttpGet("ForgotPassword")]
         [AllowAnonymous]
         public async Task<IActionResult> ForgotPassword(ForgotPassword forgot)
         {
@@ -201,6 +226,7 @@ namespace ContactBook.API.Controllers
         /// <returns>Returns the result</returns>
         [HttpPost("ResetPassword")]
         [AllowAnonymous]
+        [Authorize]
         public async Task<IActionResult> ResetPassword(ResetPassword reset)
         {
             if (ModelState.IsValid)
@@ -209,7 +235,13 @@ namespace ContactBook.API.Controllers
                 {
                     return BadRequest("Password mismatch");
                 }
-                var user = await userManager.FindByEmailAsync(reset.Email);
+                var user = await userManager.FindUserByClaimPrincipalWithProfileWithInvitUrer(HttpContext.User);
+                if (user.IsInvite)
+                {
+                    user.IsInvite = false;
+                    user.Profile.inviteUsers.SingleOrDefault(iu => iu.Email == user.Email).StatusUser = StatusUser.Active;
+                    await userManager.UpdateAsync(user);
+                }
                 if (user is null)
                 {
                     return BadRequest("Not Found");

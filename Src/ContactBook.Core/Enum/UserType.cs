@@ -8,7 +8,7 @@ namespace ContactBook.Core.Enum
 {
     public enum UserType
     {
-        Administrator,
-        RegularUser
+        Admin = 1,
+        User
     }
 }

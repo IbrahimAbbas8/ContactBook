@@ -82,5 +82,10 @@ namespace ContactBook.Infrastructure.Repository
         {
             return await context.Set<T>().CountAsync();
         }
+
+        public async Task SaveChanges()
+        {
+            await context.SaveChangesAsync();
+        }
     }
 }

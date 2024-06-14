@@ -47,6 +47,7 @@ namespace ContactBook.API.Controllers
         /// <param name="emailRequest">Data necessary for the transmission process</param>
         /// <returns></returns>
         [HttpPost("send-text")]
+        [Authorize]
         public async Task<IActionResult> SendEmail(EmailRequest emailRequest)
         {
             if(ModelState.IsValid)
@@ -106,8 +107,8 @@ namespace ContactBook.API.Controllers
         /// <returns>Array byte</returns>
         private async Task<byte[]> ExportToPDF([FromQuery] Params Params)
         {
-            var AccountId = userManager.FindUserId(HttpContext.User);
-            var contacts = await repository.GetAllAsync(Params, AccountId.Id);
+            var AccountId = userManager.FindUserByClaimPrincipalWithProfile(HttpContext.User).Result;
+            var contacts = await repository.GetAllAsync(Params, AccountId.Profile.Id);
             var pdfBytes = pdfServic.CreatePdf(contacts);
             return pdfBytes;
         }

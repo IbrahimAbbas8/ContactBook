@@ -1,5 +1,6 @@
 ﻿using ContactBook.Core.Entities;
 using ContactBook.Core.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -16,11 +17,13 @@ namespace ContactBook.Infrastructure.Repository
     {
         private readonly IConfiguration configuration;
         private readonly SymmetricSecurityKey key;
+        private readonly UserManager<AppUser> _userManager;
 
-        public TokenServices(IConfiguration configuration)
+        public TokenServices(IConfiguration configuration, UserManager<AppUser> userManager)
         {
             this.configuration = configuration;
             key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Token:Key"]));
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -28,14 +31,19 @@ namespace ContactBook.Infrastructure.Repository
         /// </summary>
         /// <param name="appUser">Object of user</param>
         /// <returns></returns>
-        public string CreateToken(AppUser appUser)
+        public async Task<string> CreateToken(AppUser appUser)
         {
             var claims = new List<Claim>()
             {
                 new Claim("FirstName", appUser.FirstName),
                 new Claim("LastName", appUser.LastName),
                 new Claim(JwtRegisteredClaimNames.Email, appUser.Email),
+                new Claim(JwtRegisteredClaimNames.NameId, appUser.Id.ToString())
             };
+
+            var roles = await _userManager.GetRolesAsync(appUser);
+            claims.AddRange(roles.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
+
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
             var tokenDescriptor = new SecurityTokenDescriptor
             {

@@ -37,8 +37,8 @@ namespace ContactBook.API.Controllers
         [HttpGet("get-all-inviteUser")]
         public async Task<ActionResult> Get([FromQuery] Params Params)
         {
-            var AccountId = _userManager.FindUserId(HttpContext.User);
-            var inviteUser = await _repository.GetAllAsync(Params, AccountId.Id);
+            var AccountId = _userManager.FindUserByClaimPrincipalWithProfile(HttpContext.User).Result;
+            var inviteUser = await _repository.GetAllAsync(Params, AccountId.Profile.Id);
             if (inviteUser is not null)
             {
                 return Ok(new Pagination<InviteUserDto>(Params.PageNumber, Params.PageSize, inviteUser));
@@ -53,9 +53,10 @@ namespace ContactBook.API.Controllers
         /// <param name="id">ID of the requested inviteUser</param>
         /// <returns>inviteUser</returns>
         [HttpGet("get-inviteUser-by-id/{id}")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<ActionResult> GetById(int id)
         {
-            var inviteUser = await _repository.GetByIdAsync(id, p => p.AppUser);
+            var inviteUser = await _repository.GetByIdAsync(id, p => p.Profile);
             if (inviteUser is not null)
             {
                 var res = mapper.Map<InviteUserDto>(inviteUser);
@@ -78,10 +79,10 @@ namespace ContactBook.API.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var AccountId = _userManager.FindUserId(HttpContext.User);
+                    var AccountId = _userManager.FindUserByClaimPrincipalWithProfile(HttpContext.User).Result;
                     var invit = mapper.Map<InviteUser>(inviteUserDto);
-                    invit.AppUserId = AccountId.Id;
-                    await _repository.AddAsync(invit);
+                    invit.ProfileId = AccountId.Profile.Id;
+                    await _repository.AddAsyncInvite(invit);
                     return Ok(inviteUserDto);
                 }
                 return BadRequest(inviteUserDto);
@@ -109,9 +110,9 @@ namespace ContactBook.API.Controllers
                 if (ModelState.IsValid)
                 {
                     if (id != inviteUserDto.Id) return BadRequest();
-                    var AccountId = _userManager.FindUserId(HttpContext.User);
+                    var AccountId = _userManager.FindUserByClaimPrincipalWithProfile(HttpContext.User).Result;
                     var invit = mapper.Map<InviteUser>(inviteUserDto);
-                    invit.AppUserId = AccountId.Id;
+                    invit.ProfileId = AccountId.Profile.Id;
                     await _repository.UpdateAsync(id, invit);
                     return Ok(inviteUserDto);
                 }

@@ -11,8 +11,8 @@ namespace ContactBook.Core.Interfaces
 {
     public interface IContactRepository : IGenericRepository<Contact>
     {
-        Task<IList<ContactDto>> GetAllAsync(Params Params, string AccountId);
-        Task<bool> AddAsync(CreateContactDto dto, string AccountId);
+        Task<IList<ContactDto>> GetAllAsync(Params Params, int ProfileId);
+        Task<bool> AddAsync(CreateContactDto dto, int ProfileId);
         Task<bool> UpdateAsync(int id, UpdateContactDto dto);
         Task<(bool, Contact)> DeleteAsyncWithImage(int id);
     }

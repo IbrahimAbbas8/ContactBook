@@ -1,5 +1,6 @@
 ﻿using ContactBook.Core.Entities;
 using ContactBook.Core.Enum;
+using ContactBook.Core.Sharing;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace ContactBook.Infrastructure.Data.Config
 {
     public class SeedingData
     {
-        public static async Task SeedUserAsync(UserManager<AppUser> userManager)
+        public static async Task SeedUserAsync(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             if (!userManager.Users.Any())
             {
@@ -22,7 +23,17 @@ namespace ContactBook.Infrastructure.Data.Config
                     LastName = "Abbas",
                     Email = "ibrahim@gmail.com",
                     UserName = "ibrahim@gmail.com",
-                    Contacts = new List<Contact>
+                    Profile = new Profile
+                    {
+                        CompanyName = "MMM",
+                        VatNumber = 0,
+                        Street = "test street",
+                        Street2 = "test street",
+                        City = "Azaz",
+                        State = "haram",
+                        ZipCode = "123z",
+                        Country = Country.Syria,
+                        Contacts = new List<Contact>
                     {
                         new Contact
                         {
@@ -61,16 +72,16 @@ namespace ContactBook.Infrastructure.Data.Config
                             MobileNumber = "+905637006227",
                         },
                     },
-                    inviteUsers = new List<InviteUser>()
-                    {
+                        inviteUsers = new List<InviteUser>()
+                     {
                         new InviteUser
                         {
                             FirstName = "Ibrahim",
                             LastName = "Abbas",
                             Email = "ibrahim@gmail.com",
                             PhoneNumber = "+905637006227",
-                            StatusUser = StatusUser.Active,
-                            UserType = UserType.Administrator,
+                            StatusUser = StatusUser.Pending,
+                            UserType = UserType.User,
                         },
                         new InviteUser
                         {
@@ -78,8 +89,8 @@ namespace ContactBook.Infrastructure.Data.Config
                             LastName = "Abbas",
                             Email = "Baraa@gmail.com",
                             PhoneNumber = "+905637006227",
-                            StatusUser = StatusUser.Active,
-                            UserType = UserType.Administrator,
+                            StatusUser = StatusUser.Pending,
+                            UserType = UserType.User,
                         },
                         new InviteUser
                         {
@@ -87,23 +98,29 @@ namespace ContactBook.Infrastructure.Data.Config
                             LastName = "Abbas",
                             Email = "Jamal@gmail.com",
                             PhoneNumber = "+905637006227",
-                            StatusUser = StatusUser.Active,
-                            UserType = UserType.Administrator,
+                            StatusUser = StatusUser.Pending,
+                            UserType = UserType.User,
                         },
                     },
-                    Profile = new Profile
-                    {
-                        CompanyName = "MMM",
-                        VatNumber = 0,
-                        Street = "test street",
-                        Street2 = "test street",
-                        City = "Azaz",
-                        State = "haram",
-                        ZipCode = "123z",
-                        Country = Country.Syria
-                    }
+                    },
+
+
+
                 };
+
+
+                if (!await roleManager.RoleExistsAsync(UserRoles.Admin))
+                {
+                    await roleManager.CreateAsync(new IdentityRole() { Name = UserRoles.Admin });
+                }
+                if (!await roleManager.RoleExistsAsync(UserRoles.User))
+                {
+                    await roleManager.CreateAsync(new IdentityRole() { Name = UserRoles.User });
+                }
+                var us = await userManager.FindByEmailAsync("ibrahim@gmail.com");
+
                 await userManager.CreateAsync(user, "P@$$w0rd");
+                await userManager.AddToRoleAsync(user, UserRoles.Admin);
             }
         }
     }

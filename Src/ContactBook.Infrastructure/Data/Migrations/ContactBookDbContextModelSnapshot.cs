@@ -69,6 +69,9 @@ namespace ContactBook.Infrastructure.Data.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsInvite")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
@@ -95,6 +98,9 @@ namespace ContactBook.Infrastructure.Data.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<int>("ProfileId")
+                        .HasColumnType("int");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -115,6 +121,8 @@ namespace ContactBook.Infrastructure.Data.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("ProfileId");
+
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
@@ -131,9 +139,6 @@ namespace ContactBook.Infrastructure.Data.Migrations
 
                     b.Property<string>("Address2")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ContactPicture")
                         .HasColumnType("nvarchar(max)");
@@ -162,9 +167,12 @@ namespace ContactBook.Infrastructure.Data.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ProfileId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
+                    b.HasIndex("ProfileId");
 
                     b.ToTable("Contacts");
                 });
@@ -176,9 +184,6 @@ namespace ContactBook.Infrastructure.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -192,6 +197,9 @@ namespace ContactBook.Infrastructure.Data.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ProfileId")
+                        .HasColumnType("int");
+
                     b.Property<int>("StatusUser")
                         .HasColumnType("int");
 
@@ -200,7 +208,7 @@ namespace ContactBook.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
+                    b.HasIndex("ProfileId");
 
                     b.ToTable("InviteUsers");
                 });
@@ -214,7 +222,7 @@ namespace ContactBook.Infrastructure.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
@@ -241,10 +249,6 @@ namespace ContactBook.Infrastructure.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AppUserId")
-                        .IsUnique()
-                        .HasFilter("[AppUserId] IS NOT NULL");
 
                     b.ToTable("Profiles");
                 });
@@ -382,31 +386,37 @@ namespace ContactBook.Infrastructure.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("ContactBook.Core.Entities.AppUser", b =>
+                {
+                    b.HasOne("ContactBook.Core.Entities.Profile", "Profile")
+                        .WithMany("AppUsers")
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Profile");
+                });
+
             modelBuilder.Entity("ContactBook.Core.Entities.Contact", b =>
                 {
-                    b.HasOne("ContactBook.Core.Entities.AppUser", "AppUser")
+                    b.HasOne("ContactBook.Core.Entities.Profile", "Profile")
                         .WithMany("Contacts")
-                        .HasForeignKey("AppUserId");
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("AppUser");
+                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("ContactBook.Core.Entities.InviteUser", b =>
                 {
-                    b.HasOne("ContactBook.Core.Entities.AppUser", "AppUser")
+                    b.HasOne("ContactBook.Core.Entities.Profile", "Profile")
                         .WithMany("inviteUsers")
-                        .HasForeignKey("AppUserId");
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("AppUser");
-                });
-
-            modelBuilder.Entity("ContactBook.Core.Entities.Profile", b =>
-                {
-                    b.HasOne("ContactBook.Core.Entities.AppUser", "AppUser")
-                        .WithOne("Profile")
-                        .HasForeignKey("ContactBook.Core.Entities.Profile", "AppUserId");
-
-                    b.Navigation("AppUser");
+                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -460,11 +470,11 @@ namespace ContactBook.Infrastructure.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ContactBook.Core.Entities.AppUser", b =>
+            modelBuilder.Entity("ContactBook.Core.Entities.Profile", b =>
                 {
-                    b.Navigation("Contacts");
+                    b.Navigation("AppUsers");
 
-                    b.Navigation("Profile");
+                    b.Navigation("Contacts");
 
                     b.Navigation("inviteUsers");
                 });

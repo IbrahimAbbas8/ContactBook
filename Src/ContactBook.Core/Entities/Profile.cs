@@ -18,6 +18,8 @@ namespace ContactBook.Core.Entities
         public string ZipCode { get; set; }
         public Country Country { get; set; }
         public string AppUserId { get; set; }
-        public virtual AppUser? AppUser { get; set; }
+        public virtual List<Contact> Contacts { get; set; } = new List<Contact>();
+        public virtual List<InviteUser> inviteUsers { get; set; } = new List<InviteUser>();
+        public virtual List<AppUser> AppUsers { get; set; }
     }
 }

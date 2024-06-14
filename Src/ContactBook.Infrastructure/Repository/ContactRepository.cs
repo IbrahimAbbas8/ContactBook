@@ -31,11 +31,11 @@ namespace ContactBook.Infrastructure.Repository
             this.mapper = mapper;
         }
 
-        public async Task<IList<ContactDto>> GetAllAsync(Params Params, string AccountId)
+        public async Task<IList<ContactDto>> GetAllAsync(Params Params, int ProfileId)
         {
             var query = await context.Contacts
                 .AsNoTracking()
-                .Where(c => c.AppUserId == AccountId)
+                .Where(c => c.ProfileId == ProfileId)
                 .ToListAsync();
 
             // Search
@@ -53,7 +53,7 @@ namespace ContactBook.Infrastructure.Repository
             return result;
         }
 
-        public async Task<bool> AddAsync(CreateContactDto dto, string AccountId)
+        public async Task<bool> AddAsync(CreateContactDto dto, int ProfileId)
         {
             if (dto.Image is not null)
             {
@@ -74,7 +74,7 @@ namespace ContactBook.Infrastructure.Repository
 
                 var res = mapper.Map<Contact>(dto);
                 res.ContactPicture = src;
-                res.AppUserId = AccountId;
+                res.ProfileId = ProfileId;
                 await context.Contacts.AddAsync(res);
                 await context.SaveChangesAsync();
                 return true;
